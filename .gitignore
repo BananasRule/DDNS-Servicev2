@@ -5,3 +5,6 @@
 *.conf
 !examplednsconfig.conf
 !examplemailconfig.conf
+
+#Ignore pycache
+**/pycache
