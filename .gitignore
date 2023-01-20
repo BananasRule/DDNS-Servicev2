@@ -1,0 +1,7 @@
+#Ignore data file
+*.data
+
+#Ignore anything but the example config files
+*.conf
+!examplednsconfig.conf
+!examplemailconfig.conf
