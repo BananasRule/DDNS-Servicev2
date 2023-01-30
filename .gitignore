@@ -2,7 +2,7 @@
 *.data
 
 #Ignore log files
-8.log
+*.log
 
 #Ignore anything but the example config files
 *.conf
