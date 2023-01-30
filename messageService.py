@@ -14,10 +14,10 @@ class Messenger:
     # @param port Server STMP port (Int)
     # @param key API Key / Username (String)
     # @param secret API Secret / Password (String)
-    # @param TLS Use TLS (Bool)
-    # @param SSL Use SSL (Bool)
-    # @param sendAddress The address the message will be sent from (String)
-    # @param recAddress The address the message will be sent to (String)
+    # @param tls Use TLS (Bool)
+    # @param ssl Use SSL (Bool)
+    # @param fromAddress The address the message will be sent from (String)
+    # @param toAddress The address the message will be sent to (String)
     def __init__(self, server, port, key, secret, tls, ssl, fromAddress, toAddress):
         self.partHeader = "To:"+ toAddress + "\nFrom:" + fromAddress + "\n"
         self.server = server
