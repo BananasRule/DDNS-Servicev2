@@ -1,13 +1,17 @@
 #Ignore data file
 *.data
 
+#Ignore log files
+8.log
+
 #Ignore anything but the example config files
 *.conf
-!examplednsconfig.conf
-!examplemailconfig.conf
+!example_dnsconfig.conf
+!example_mailconfig.conf
 
 #Ignore pycache
-**/pycache
+__pycache__/
+*.py[cod]
 
 #Ignore fleet dev env variables
 **/.fleet
