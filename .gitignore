@@ -8,3 +8,6 @@
 
 #Ignore pycache
 **/pycache
+
+#Ignore fleet dev env variables
+**/.fleet
