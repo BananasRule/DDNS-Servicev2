@@ -11,7 +11,7 @@ import requests, time
 # @throws getIPError Cannot connect to IP server
 # @returns Current IP Address (String)
 
-def service(IPv4 = True):
+def Get(IPv4 = True):
 
     # Variables to determine services to use
     if IPv4 == True:
