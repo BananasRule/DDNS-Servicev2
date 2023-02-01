@@ -1,12 +1,20 @@
 import logging
 
+# A class used to store zone information
+class zone:
+    def __init__(self):
+        self.name = ""
+        self.ID = ""
+        self.apiKey = ""
+        self.listType = True
+        self.list = []
 
 ## Service for loading the DNS config file
-# Uses file called dnsconfig.conf
+# Uses file called dnsconfig.conf in config directory (config/dnsconfig.conf)
 # @returns A dictionary containing setting fields (raw from file) and zone information
 def DNSConfigLoad():
     # Parse config files
-    dnsConfig = open("dnsconfig.conf")
+    dnsConfig = open("config/dnsconfig.conf")
     dnsSettings = {}
     dnsSettings["zones"] = []
     variables = {}
@@ -31,11 +39,11 @@ def DNSConfigLoad():
                 if setting == "!BEGINDNSZONE":
                     inDnsZone = True
                     # Add new zone with default values
-                    dnsSettings["zones"].append(["", "", "", False, []])
+                    dnsSettings["zones"].append(zone())
                 elif setting == "!ENDDNSZONE":
                     # Check zone meets minimum requirements
-                    if dnsSettings["zones"][currentZoneNum][0] != "" and dnsSettings["zones"][currentZoneNum][1] != "" \
-                       and dnsSettings["zones"][currentZoneNum][2] != "":
+                    if dnsSettings["zones"][currentZoneNum].name != "" and dnsSettings["zones"][currentZoneNum].id != "" \
+                       and dnsSettings["zones"][currentZoneNum].apiKey != "":
                         # Get next index
                         currentZoneNum = currentZoneNum + 1
                         inDnsZone = False
@@ -48,27 +56,28 @@ def DNSConfigLoad():
 
                 # Check if value is a variable and is in variables dictionary
                 # If it is not treat as a literal
-                if value[0] == "$":
-                    if value in variables:
-                        value = variables[value]
+                if len(value) != 0:
+                    if value[0] == "$":
+                        if value in variables:
+                            value = variables[value]
 
-                match var:
-                    case "zoneName":
-                        dnsSettings["zones"][currentZoneNum][0] = value
-                    case "zoneID":
-                        dnsSettings["zones"][currentZoneNum][1] = value
-                    case "zoneKey":
-                        dnsSettings["zones"][currentZoneNum][2] = value
-                    case "listType":
-                        if value.upper() == "DENY":
-                            dnsSettings["zones"][currentZoneNum][3] = False
-                        elif value.upper() == "ALLOW":
-                            dnsSettings["zones"][currentZoneNum][3] = True
-                        else:
-                            logging.warning("Error setting list type, defaulting to deny list")
-                            dnsSettings["zones"][currentZoneNum][3] = False
-                    case "list":
-                        dnsSettings["zones"][currentZoneNum][4] = value.split(",")
+                    match var:
+                        case "zoneName":
+                            dnsSettings["zones"][currentZoneNum].name = value
+                        case "zoneID":
+                            dnsSettings["zones"][currentZoneNum].id = value
+                        case "zoneKey":
+                            dnsSettings["zones"][currentZoneNum].apiKey = value
+                        case "listType":
+                            if value.upper() == "DENY":
+                                dnsSettings["zones"][currentZoneNum].listType = True
+                            elif value.upper() == "ALLOW":
+                                dnsSettings["zones"][currentZoneNum].listType = False
+                            else:
+                                logging.warning("Error setting list type, defaulting to deny list")
+                                dnsSettings["zones"][currentZoneNum].listType = True
+                        case "list":
+                            dnsSettings["zones"][currentZoneNum].list = value.split(",")
             else:
                 # Not part of zone
                 # Split setting into name and variable
@@ -80,15 +89,16 @@ def DNSConfigLoad():
                         value = variables[value]
                 # Store in dictonary
                 dnsSettings[var] = value
+    dnsConfig.close()
     return dnsSettings
 
 
 ## Service for loading the mail config file
-# Uses file called mailconfig.conf
+# Uses file called mailconfig.conf in config directory (config/mailconfig.conf)
 # @returns A dictionary containing setting fields (raw from file) and zone information
 def MailConfigLoad():
 
-    mailConfig = open("mailconfig.conf")
+    mailConfig = open("config/mailconfig.conf")
     mailSettings = {}
     variables = {}
     for line in mailConfig:
@@ -112,9 +122,9 @@ def MailConfigLoad():
                 if value[0] == "$":
                     if value in variables:
                         value = variables[value]
-                # Store in dictonary
+                # Store in dictionary
                 mailSettings[var] = value
-
+    mailConfig.close()
     return mailSettings
 
 

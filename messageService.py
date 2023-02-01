@@ -9,9 +9,9 @@ import smtplib, datetime
 
 class Messenger:
 
-    ## Initalise object
+    ## Initialise object
     # @param server Server web address (String)
-    # @param port Server STMP port (Int)
+    # @param port Server SMTP port (Int)
     # @param key API Key / Username (String)
     # @param secret API Secret / Password (String)
     # @param tls Use TLS (Bool)
@@ -26,68 +26,92 @@ class Messenger:
         self.secret = secret
         self.tls = tls
         self.ssl = ssl
+        self.fromAddress = fromAddress
+        self.toAddress = toAddress
 
-
+    ## Function used to send messages
+    # @param subject The message subject
+    # @param message The message to send
     def Send(self, subject, message):
-        pass
+        # Create header and message to send
+        header = self.partHeader + "Subject:" + subject + "\n"
+        msg = header + message
 
-    ## Compose message to send
-    # @param successUpdate A 2D array containing [[Zone Name, ID]] of successfully updated zones (2D Array)
-    # @param failedUpdate A 2D array containing [[Zone Name, ID]] of zones that failed to update (2D Array)
-    # @param currentIP Servers current IP address (String)
-    # @param sendIP Should the current IP be included in the message (Bool)
-    # @returns Message to be passed to Send module
-    def Compose(successUpdate, failedUpdate, currentIP, sendIP):
-        message = ""
-
-        #Check to see if there were any failures to determine email subject
-        if len(failedUpdate) == 0:
-            message = message + "Subject:DNS Records Sucessfully Updated/n"
+        # Connect to server
+        if self.ssl:
+            mailServer = smtplib.SMTP_SSL(self.server, self.port)
         else:
-            message = message + "Subject:DNS Records Failed To Update/n"
+            mailServer = smtplib.SMTP(self.server, self.port)
 
+        # If TLS is enabled and SSL is not
+        if self.tls and not self.ssl:
+            mailServer.starttls()
+            mailServer.ehlo()
+
+        # Login to mail server
+        mailServer.login(self.key, self.secret)
+
+        # Send message
+        mailServer.sendmail(self.fromAddress, self.toAddress, msg)
+
+        # Close connection
+        mailServer.quit()
+
+# Helper functions for composing messages
+
+## A function for directly composing the message in special circumstances
+# @param subject Message subject
+# @param body Message Body
+# @returns Message to be passed to send
+
+
+## Compose message to send
+# @param zoneName The name of the zone updated
+# @param successUpdate An array containing the ID of successfully updated zones (Array)
+# @param failedUpdate An array containing the ID of zones that failed to update (Array)
+# @param previousMessage The previous message composed (default to "") (String)
+# @returns Message to be passed to Send module
+def Compose(zoneName, successUpdate, failedUpdate, previousMessage = ""):
+    message = previousMessage
+    if len(successUpdate) != 0 or len(failedUpdate) != 0:
+        message = message + zoneName + "\n"
         #Loop through each successful update message if at least one exists
         if len(successUpdate) != 0:
             #Add header message
-            message = message + "The following domains sucessfully updated:\n"
+            message = message + "   The following domains successfully updated:\n"
             #Loop through zones listing zone and IDs
-            for zone in successUpdate:
-                # Shouldn't occour but to catch a blank zone anyway
-                if len(zone) != 0:
-                    message = message + "   " + zone[0] + "\n"
-                    for id in zone[1:]:
-                        message = message + "       " + id + "\n"
+            for domain in successUpdate:
+                # Shouldn't occur but to catch a blank zone anyway
+                if len(domain) != 0:
+                    message = message + "       " + domain + "\n"
 
         #Loop through each failed update message if at least one exists
         if len(failedUpdate) != 0:
             #Add header message
-            message = message + "The following domains failed to update:\n"
+            message = message + "   The following domains failed to update:\n"
             #Loop through zones listing zone and IDs
             for zone in failedUpdate:
-                # Shouldn't occour but to catch a blank zone anyway
+                # Shouldn't occur but to catch a blank zone anyway
                 if len(zone) != 0:
-                    message = message + "   " + zone[0] + "\n"
-                    for id in zone[1:]:
+                    for id in zone:
                         message = message + "       " + id + "\n"
 
-        #If sendIP address is true send the current IP address
-        if sendIP:
-            message = message + "The servers current IP address is: " + currentIP + " .\n"
+    #Return message
+    return message
 
-        #Append date and time to message
-        message = message + "This message was sent on " + datetime.now.stftime("%d/%m/%Y %H:%M:%S") + "."
+## A function to add to datetime and IP address to the footer of a message
+# @param message The message to have the footer append to (String)
+# @param currentIP The current IP address of the server (String)
+# @param sendIP Include the IP address in the footer (Bool)
+def Footer(message, currentIP, sendIP):
 
-        #Return message
-        return message
+    #If sendIP address is true send the current IP address
+    if sendIP:
+        message = message + "The servers current IP address is: " + currentIP + ".\n"
 
-    ## A calass function for directrly composing the message in special circumstances
-    # @param subject Message subject
-    # @param body Message Body
-    # @returns Message to be passed to send
-    def ComposeSpecial(subject, body):
-        message = "Subject:" + subject + "\n" + body + "\n" + "This message was sent on " + datetime.now.stftime("%d/%m/%Y %H:%M:%S") + "."
-        return message
-
+    #Append date and time to message
+    message = message + "This message was sent on " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "."
+    return message
 
 
 
