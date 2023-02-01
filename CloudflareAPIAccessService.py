@@ -10,18 +10,18 @@ import requests
 
 class AccessService:
 
-    ## Initalise the object
-    # @param authToken Cloudflare API key with zone edit permisions
+    ## Initialise the object
+    # @param authToken Cloudflare API key with zone edit permissions
     # @param zoneURL The zone id of the target zone
     def __init__(self, authToken, zoneURL):
-        # Define cloudflare secret credientals for object
+        # Define cloudflare secret credentials for object
         self.authToken = authToken
         self.zoneURL = zoneURL
 
 
     ## Get all IPv4 / A records
-    # Return relevent details about each record needed for updating
-    # @params IPv4 IPv4 records vs IPv6 (Bool) (Default = True)
+    # Return relevant details about each record needed for updating
+    # @param IPv4 IPv4 records vs IPv6 (Bool) (Default = True)
     # @returns 2D Array containing domains and their ID, name and listed ip address
     # @throws AccessError Exception is thrown when function is unable to access records
     def GetAllRecords(self, IPv4 = True):
@@ -34,8 +34,8 @@ class AccessService:
         # Catch errors relating to getting or sorting the record
         try:
             #Send request
-            listOfRecords = requests.get("https://api.cloudflare.com/client/v4/zones/" + self.zoneURL + "/dns_records/", headers=headers, params=parameters)
-            #Convert request from json and seperate to wanted array
+            listOfRecords = requests.get("https://api.cloudflare.com/client/v4/zones/" + self.zoneURL + "/dns_records", headers=headers, params=parameters)
+            #Convert request from json and separate to wanted array
             listOfRecords = listOfRecords.json()
             listOfRecords = listOfRecords["result"]
             recordDetails = []
@@ -54,25 +54,25 @@ class AccessService:
 
     ## Update DNS records
     # Update DNS records when old IP address exists and DNS name does not match list
-    # @params ipAddress Current ip address
-    # @params list Domains for blacklist / whitelist
-    # @params blacklist Is the list a blacklist or whitelist (default:true)
-    # @params IPv4 Is IPv4 address (vs IPv6) (default = True)
+    # @param ipAddress Current ip address
+    # @param list Domains for blacklist / whitelist
+    # @param blacklist Is the list a blacklist or whitelist (default:true)
+    # @param IPv4 Is IPv4 address (vs IPv6) (default = True)
     # @returns 2D array [Success Domains[], Failed Domains[], Blocked by list[]]
-    # @throws AmmendError Exception is thrown when a error occurs whilst ammending records
+    # @throws ModifyError Exception is thrown when a error occurs whilst Modifying records
     # @throws AccessError Originates from getAllRecords; Exception is thrown when function is unable to access records
-    def UpdateRecords(self, ipAddress, list = [], blacklist = True, IPv4 = True):
+    def UpdateRecords(self, ipAddress, list = [], denylist = True, IPv4 = True):
         # See output above
         status = [[],[],[]]
         # Get list of records from server
         # Needs refactoring to catch errors generated
-        records = self.getAllRecords()
+        records = self.GetAllRecords()
         # Iterate over each record
         try:
             for record in records:
                 # Check that record is not blacklisted or is included in whitelist (depending on selection)
-                if (( (not (record[1] in list)) and blacklist == True) or ((record[1] in list) and blacklist == False)):
-                    #C heck that record ip address does not equal current ip address
+                if (((not (record[1] in list)) and denylist == True) or ((record[1] in list) and denylist == False)):
+                    #Check that record ip address does not equal current ip address
                     if record[2] != ipAddress:
                         try:
                             #Content for request
@@ -113,7 +113,7 @@ class AccessService:
                 else:
                     status[2].append(record[1])
         except:
-            raise ModifyError("An error occurred when attempting to ammend DNS records. There may be a configuration error")
+            raise ModifyError("An error occurred when attempting to modify DNS records. There may be a configuration error")
         return status
 
 #Define exceptions
