@@ -13,5 +13,6 @@
 __pycache__/
 *.py[cod]
 
-#Ignore fleet dev env variables
+#Ignore dev env variables
 **/.fleet
+**/.vscode
