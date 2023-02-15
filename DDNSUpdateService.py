@@ -260,6 +260,8 @@ else:
         failedUpdates = []
         subject = ""
         mailMessage = ""
+        failedZones = []
+        store = None
 
         # Check that data directory exists, if not create it
         if not os.path.isdir("data"):
@@ -308,6 +310,8 @@ else:
                     successfulUpdates = successfulUpdates + status[0]
                     failedUpdates = failedUpdates + status[1]
                 except:
+                    mailMessage = mailMessage + zone.name + ' - Failed to access zone\n'
+                    failedUpdates = failedUpdates + ["zone:"+zone.name]
                     logging.error("Failed accessing API and updating records (Zone Name: " + zone.name + ")")
 
             if len(successfulUpdates) != 0 or len(failedUpdates) != 0:
@@ -355,7 +359,7 @@ else:
             
             savefile = open(dataFilename, "wb")
             pickle.dump(store, savefile)
-            savefile.close
+            savefile.close()
 
     # Call above function for ipv4/6 if specified in config file
     if ipv4:
