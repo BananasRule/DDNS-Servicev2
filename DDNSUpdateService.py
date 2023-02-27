@@ -6,7 +6,7 @@
 #External Dependencies
 import logging, pickle, os, datetime
 #Internal Dependencies
-import CloudflareAPIAccessService, IPService, MessageService, ConfigLoadService, DataStorage
+import APIAccessService, IPService, MessageService, ConfigLoadService, DataStorage
 import MessageService
 
 #Init Variables
@@ -293,7 +293,7 @@ else:
             exit()
 
         # Check if current IP address matches stored IP and run occurred in the last hour
-        # This is done to limit cloudflare API calls and allows a more frequent run time
+        # This is done to limit Cloudflare API calls and allows a more frequent run time
         # as the IP address APIs do not have limits (or are so high they don't matter)
         if currentIP == store.ipAddress and datetime.datetime.now().hour == store.runHour and store.status == 0:
             logging.info("Current IP address matches previous run and the previous run occurred within the same hour. Exiting Program")
@@ -301,8 +301,8 @@ else:
             # If IP address needs updating loop through zones as defined in the config file
             for zone in zones:
                 try:
-                    # Call CloudflareAPIAccessService and attempt to update zone
-                    APIService = CloudflareAPIAccessService.AccessService(zone.apiKey, zone.id)
+                    # Call APIAccessService and attempt to update zone
+                    APIService = APIAccessService.AccessService(zone.apiKey, zone.id)
                     status = APIService.UpdateRecords(currentIP, zone.list, zone.listType, isipv4)
                     #Create message for email by adding to previous message
                     mailMessage = MessageService.Compose(zone.name, status[0], status[1], mailMessage)
