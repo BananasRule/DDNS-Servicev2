@@ -13,7 +13,10 @@ This is a python program designed to update DNS records stored with Cloudflare f
 It is designed to run once a minute and will check the IP address against the previous run's IP address. If it differs, it has been more then one hour since the last run or the last run was a failure it will check the IP address of the DNS records and update them if necessary.
 
 # One click install
-Coming soon
+Run the following command to install the software
+```
+wget https://raw.githubusercontent.com/BananasRule/DDNS-Servicev2/main/installer.sh && sudo bash installer.sh 
+ ```
 
 # Licence
 This program is licensed under MPL2.0. Please also include the attribution '© Jacob Gray 2022'. Please see LICENSE.txt for information.
