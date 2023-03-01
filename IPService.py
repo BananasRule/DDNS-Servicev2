@@ -19,14 +19,14 @@ def Get(IPv4 = True):
 
     # Variables to determine services to use
     if IPv4 == True:
-        primaryServer = "https://ip4.seeip.org"
-        fallbackServer = "https://api.ipify.org/"
+        primaryServer = "https://api.ipify.org"
+        fallbackServer = "https://curlmyip.net/"
     else:
-        primaryServer = "https://ip6.seeip.org"
+        primaryServer = "https://api.ipify.org"
         # Ipify will not guarantee a ipv6 address returns
         # Hence only seeip is used
         # If there are better server please raise an issue in github
-        fallbackServer = "https://ip6.seeip.org"
+        fallbackServer = "https://curlmyip.net/"
 
     try:
         # Attempt to get IP address from primary server
