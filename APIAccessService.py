@@ -4,7 +4,7 @@
 ## file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-import requests
+import requests, logging
 # Requests
 # Copyright 2019 Kenneth Reitz
 
@@ -25,6 +25,9 @@ class AccessService:
     # @returns 2D Array containing domains and their ID, name and listed ip address
     # @throws AccessError Exception is thrown when function is unable to access records
     def GetAllRecords(self, IPv4 = True):
+        # Get logger from main process 
+        logger = logging.getLogger(__name__)
+
         # Define request headers
         if IPv4:
             parameters = {"type": "A"}
@@ -50,7 +53,8 @@ class AccessService:
             return recordDetails
         except:
             #In the event of a error throw
-            raise AccessError("Unable to access records from cloudflare. There may be a confguration issue")
+            logger.error("Unable to access records from cloudflare. There may be a configuration issue")
+            raise AccessError("Unable to access records from cloudflare. There may be a configuration issue")
 
     ## Update DNS records
     # Update DNS records when old IP address exists and DNS name does not match list
@@ -62,6 +66,8 @@ class AccessService:
     # @throws ModifyError Exception is thrown when a error occurs whilst Modifying records
     # @throws AccessError Originates from getAllRecords; Exception is thrown when function is unable to access records
     def UpdateRecords(self, ipAddress, list = [], denylist = True, IPv4 = True):
+        # Get logger from main process 
+        logger = logging.getLogger(__name__)
         # See output above
         status = [[],[],[]]
         # Get list of records from server
@@ -100,11 +106,11 @@ class AccessService:
                             }
 
                             #Send request
-                            changeResponce = requests.put(("https://api.cloudflare.com/client/v4/zones/" + self.zoneURL + "/dns_records/" + record[0]), headers=headers, json=content)
-                            changeResponce = changeResponce.json()
+                            changeResponse = requests.put(("https://api.cloudflare.com/client/v4/zones/" + self.zoneURL + "/dns_records/" + record[0]), headers=headers, json=content)
+                            changeResponse = changeResponse.json()
 
-                            #Handle incorrect responces
-                            if changeResponce["success"] == True:
+                            #Handle incorrect responses
+                            if changeResponse["success"] == True:
                                 status[0].append(record[1])
                             else:
                                 status[1].append(record[1])
@@ -113,6 +119,7 @@ class AccessService:
                 else:
                     status[2].append(record[1])
         except:
+            logger.error("An error occurred when attempting to modify DNS records. There may be a configuration error")
             raise ModifyError("An error occurred when attempting to modify DNS records. There may be a configuration error")
         return status
 

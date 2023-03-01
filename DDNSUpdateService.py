@@ -21,13 +21,15 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+logger = logging.getLogger(__name__)
+
 #Log run date and time
-logging.info("Program started")
+logger.info("Program started")
 
 try:
     dnsSettings = ConfigLoadService.DNSConfigLoad()
 except:
-    logging.critical("Unable to load DNS Config.")
+    logger.critical("Unable to load DNS Config.")
     dnsSettings = {}
     criticalConfigFailure = True
 
@@ -43,11 +45,11 @@ if "ipv4enabled" in dnsSettings:
         ipv4 = False
     else:
         # If no valid value is found default to false
-        logging.warning("Unable to load IPv4 Configuration. Defaulting to True.")
+        logger.warning("Unable to load IPv4 Configuration. Defaulting to True.")
         ipv4 = True
 else:
     # If setting cannot be found default to IPv4
-    logging.warning("Unable to find IPv4 Configuration. Defaulting to True.")
+    logger.warning("Unable to find IPv4 Configuration. Defaulting to True.")
     ipv4 = True
 
 # Load IPv6 configuration
@@ -60,11 +62,11 @@ if "ipv6enabled" in dnsSettings:
         ipv6 = False
     else:
         # If no valid value is found default to false
-        logging.warning("Unable to load IPv6 Configuration. Defaulting to False.")
+        logger.warning("Unable to load IPv6 Configuration. Defaulting to False.")
         ipv6 = False
 else:
     # If setting cannot be found default to IPv4
-    logging.warning("Unable to find IPv6 Configuration. Defaulting to False.")
+    logger.warning("Unable to find IPv6 Configuration. Defaulting to False.")
     ipv6 = False
 
 # Load user preference for sending IP Address in email
@@ -76,10 +78,10 @@ if "sendIP" in dnsSettings:
     elif dnsSettings["sendIP"].upper() == "FALSE":
         sendIP = False
     else:
-        logging.warning("Unable to load Send IP Configuration. Defaulting to False.")
+        logger.warning("Unable to load Send IP Configuration. Defaulting to False.")
         sendIP = False
 else:
-    logging.warning("Unable to find Send IP Configuration. Defaulting to False.")
+    logger.warning("Unable to find Send IP Configuration. Defaulting to False.")
     sendIP = False
 
 #Load zones as created in ConfigLoadService 
@@ -88,10 +90,10 @@ if "zones" in dnsSettings:
     if len(dnsSettings["zones"]) != 0:
         zones = dnsSettings["zones"]
     else:
-        logging.critical("Unable to load any DNS Zones.")
+        logger.critical("Unable to load any DNS Zones.")
         criticalConfigFailure = True
 else:
-    logging.critical("Error in config loader module.")
+    logger.critical("Error in config loader module.")
     criticalConfigFailure = True
 
 #Load Mail Config File
@@ -100,7 +102,7 @@ try:
     mailSettings = ConfigLoadService.MailConfigLoad()
     mailConfigSuccess = True
 except:
-    logging.error("Unable to load mail config. Program will attempt to continue but will not send emails.")
+    logger.error("Unable to load mail config. Program will attempt to continue but will not send emails.")
     mailConfigSuccess = False
 
 if mailConfigSuccess:
@@ -108,7 +110,7 @@ if mailConfigSuccess:
     if "server" in mailSettings:
         mailHost = mailSettings["server"]
     else:
-        logging.error("Unable to load mail server config. Program will attempt to continue but will not send emails.")
+        logger.error("Unable to load mail server config. Program will attempt to continue but will not send emails.")
         mailConfigSuccess = False
 
     # Attempt to load port number
@@ -116,10 +118,10 @@ if mailConfigSuccess:
         try:
             mailPort = int(mailSettings["port"])
         except:
-            logging.error("Unable to load mail port config. Program will attempt to continue but will not send emails.")
+            logger.error("Unable to load mail port config. Program will attempt to continue but will not send emails.")
             mailConfigSuccess = False
     else:
-        logging.error("Unable to load mail port config. Program will attempt to continue but will not send emails.")
+        logger.error("Unable to load mail port config. Program will attempt to continue but will not send emails.")
         mailConfigSuccess = False
 
     # Attempt to load TLS Setting
@@ -131,11 +133,11 @@ if mailConfigSuccess:
             mailTLS = False
         else:
             # If no valid value is found default to false
-            logging.warning("Unable to load TLS Configuration. Defaulting to False.")
+            logger.warning("Unable to load TLS Configuration. Defaulting to False.")
             mailTLS = False
     else:
         # If setting cannot be found default to IPv4
-        logging.warning("Unable to find TLS Configuration. Defaulting to False.")
+        logger.warning("Unable to find TLS Configuration. Defaulting to False.")
         mailTLS = False
 
     # Attempt to load SSL Setting
@@ -147,11 +149,11 @@ if mailConfigSuccess:
             mailSSL = False
         else:
             # If no valid value is found default to false
-            logging.warning("Unable to load SSL Configuration. Defaulting to False.")
+            logger.warning("Unable to load SSL Configuration. Defaulting to False.")
             mailSSL = False
     else:
         # If setting cannot be found default to IPv4
-        logging.warning("Unable to find SSL Configuration. Defaulting to False.")
+        logger.warning("Unable to find SSL Configuration. Defaulting to False.")
         mailSSL = False
 
     # Attempt to load mail from address
@@ -159,9 +161,9 @@ if mailConfigSuccess:
         mailFromAddress = mailSettings["fromAddress"]
         # Rudimentary valid email check. Won't stop invalid email.
         if ("@" in mailFromAddress) == False:
-            logging.warning("From email address does not contain @ symbol. Please check address.")
+            logger.warning("From email address does not contain @ symbol. Please check address.")
     else:
-        logging.error(
+        logger.error(
             'Unable to load mail from address config. Program will attempt to continue but will not send emails.')
         mailConfigSuccess = False
 
@@ -170,9 +172,9 @@ if mailConfigSuccess:
         mailToAddress = mailSettings["toAddress"]
         # Rudimentary valid email check. Won't stop invalid email.
         if ("@" in mailToAddress) == False:
-            logging.warning("To email address does not contain @ symbol. Please check address.")
+            logger.warning("To email address does not contain @ symbol. Please check address.")
     else:
-        logging.error(
+        logger.error(
             'Unable to load mail to address config. Program will attempt to continue but will not send emails.')
         mailConfigSuccess = False
 
@@ -180,7 +182,7 @@ if mailConfigSuccess:
     if "key" in mailSettings:
         mailKey = mailSettings["key"]
     else:
-        logging.error(
+        logger.error(
             'Unable to load mail key config. Program will attempt to continue but will not send emails.')
         mailConfigSuccess = False
 
@@ -188,7 +190,7 @@ if mailConfigSuccess:
     if "secret" in mailSettings:
         mailSecret = mailSettings["secret"]
     else:
-        logging.error(
+        logger.error(
             'Unable to load mail secret config. Program will attempt to continue but will not send emails.')
         mailConfigSuccess = False
 
@@ -201,11 +203,11 @@ if mailConfigSuccess:
     except:
         # In the event of a setup failure attempt to proceed without email
         mailConfigSuccess = False
-        logging.error("Failed to connect to mail server. Program will continue.")
+        logger.error("Failed to connect to mail server. Program will continue.")
 
 # Check for a critical failure in config
 if criticalConfigFailure:
-    logging.critical("A critical failure was detected.")
+    logger.critical("A critical failure was detected.")
     if mailConfigSuccess:
         
         dataFilename = "data/EDDNS.data"
@@ -230,7 +232,7 @@ if criticalConfigFailure:
             mailMessage = "A critical error occurred. Please see log files for more info. The program did not run.\nThis message was sent at: " \
                 + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "."
             mailServer.Send("DDNS Service had critical failure", mailMessage)
-            logging.critical("An email advising of the critical error was sent.")
+            logger.critical("An email advising of the critical error was sent.")
 
             # Save updated details to store if email was sent
             # This should allow for retries if email did not send
@@ -240,7 +242,7 @@ if criticalConfigFailure:
             pickle.dump(store, savefile)
             savefile.close
 
-    logging.critical("The program will now exit.")
+    logger.critical("The program will now exit.")
 
 
 else:
@@ -289,14 +291,14 @@ else:
             if (store.status != 2 or datetime.datetime.now().hour != store.runHour()) and mailConfigSuccess == True:
                 mailServer.Send("IP Address Error", "An error occurred determining IP Address.\nThis email was sent at " \
                     + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-            logging.critical("Error in determining IPv4 Address. Exiting Program")
+            logger.critical("Error in determining IPv4 Address. Exiting Program")
             exit()
 
         # Check if current IP address matches stored IP and run occurred in the last hour
         # This is done to limit Cloudflare API calls and allows a more frequent run time
         # as the IP address APIs do not have limits (or are so high they don't matter)
         if currentIP == store.ipAddress and datetime.datetime.now().hour == store.runHour and store.status == 0:
-            logging.info("Current IP address matches previous run and the previous run occurred within the same hour. Exiting Program")
+            logger.info("Current IP address matches previous run and the previous run occurred within the same hour. Exiting Program")
         else:
             # If IP address needs updating loop through zones as defined in the config file
             for zone in zones:
@@ -312,21 +314,21 @@ else:
                 except:
                     mailMessage = mailMessage + zone.name + ' - Failed to access zone\n'
                     failedUpdates = failedUpdates + ["zone:"+zone.name]
-                    logging.error("Failed accessing API and updating records (Zone Name: " + zone.name + ")")
+                    logger.error("Failed accessing API and updating records (Zone Name: " + zone.name + ")")
 
             if len(successfulUpdates) != 0 or len(failedUpdates) != 0:
                 # Define email subject and leave log depending on if any items failed
                 if len(failedUpdates) == 0:
                     subject = "DNS Records Successfully Updated"
-                    logging.info("Domains successfully updated")
+                    logger.info("Domains successfully updated")
                 else:
                     subject = "DNS Records Failed To Update"
-                    logging.warning("Domains failed to update")
+                    logger.warning("Domains failed to update")
             else:
                 # If no items changed in the run log that outcome
                 #The subject shouldn't be called but this is a fallback -
                 subject = "DNS Records Not Updated"
-                logging.info("Domains were checked but none needed updating")
+                logger.info("Domains were checked but none needed updating")
 
             
             #Send email to user if configured correctly
@@ -340,9 +342,9 @@ else:
                             mailMessage = MessageService.Footer(mailMessage, currentIP, sendIP)
                             #Send email
                             mailServer.Send(subject, mailMessage)
-                            logging.info("Email Sent")
+                            logger.info("Email Sent")
                         except:
-                            logging.error("Email failed to send")
+                            logger.error("Email failed to send")
 
             
             # Store information for next run

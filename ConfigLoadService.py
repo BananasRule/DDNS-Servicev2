@@ -19,6 +19,10 @@ class zone:
 # Uses file called dnsconfig.conf in config directory (config/dnsconfig.conf)
 # @returns A dictionary containing setting fields (raw from file) and zone information
 def DNSConfigLoad():
+
+    # Get logger from main process 
+    logger = logging.getLogger(__name__)
+
     # Parse config files
     dnsConfig = open("config/dnsconfig.conf")
     dnsSettings = {}
@@ -54,7 +58,7 @@ def DNSConfigLoad():
                         currentZoneNum = currentZoneNum + 1
                         inDnsZone = False
                     else:
-                        logging.error("Error getting zone details, removing zone and attempting to recover")
+                        logger.error("Error getting zone details, removing zone and attempting to recover")
                         dnsSettings["zones"].pop()
                         inDnsZone = False
             elif inDnsZone:
@@ -80,7 +84,7 @@ def DNSConfigLoad():
                             elif value.upper() == "ALLOW":
                                 dnsSettings["zones"][currentZoneNum].listType = False
                             else:
-                                logging.warning("Error setting list type, defaulting to deny list")
+                                logger.warning("Error setting list type, defaulting to deny list")
                                 dnsSettings["zones"][currentZoneNum].listType = True
                         case "list":
                             dnsSettings["zones"][currentZoneNum].list = value.split(",")
@@ -118,7 +122,7 @@ def MailConfigLoad():
         if len(setting) != 0:
             if setting[0] == "$":
                 var, value = setting.split("=", 1)
-                # Store in dictonary
+                # Store in dictionary
                 variables[var] = value
             else:
                 # Split setting into name and variable

@@ -3,7 +3,7 @@
 ## License, v. 2.0. If a copy of the MPL was not distributed with this
 ## file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import requests, time
+import requests, time, logging
 # Requests
 # Copyright 2019 Kenneth Reitz
 
@@ -13,6 +13,9 @@ import requests, time
 # @returns Current IP Address (String)
 
 def Get(IPv4 = True):
+
+    # Get logger from main process 
+    logger = logging.getLogger(__name__)
 
     # Variables to determine services to use
     if IPv4 == True:
@@ -27,21 +30,23 @@ def Get(IPv4 = True):
 
     try:
         # Attempt to get IP address from primary server
-        ipAddressResponce = requests.get(primaryServer)
-        # Check that a valid responce was
-        if ipAddressResponce.status_code != 200:
+        ipAddressResponse = requests.get(primaryServer)
+        # Check that a valid response was received 
+        if ipAddressResponse.status_code != 200:
             raise getIPError()
 
     # This is a broad except as any error caught should cause the fallback server to be used
     # in an attempt to recover
     except:
-        # Wait to mitgate unexpected short network interuptions
+        # Log error
+        logger.warning("An unexpected error occurred with the primary IP service. Attempting connection to fallback server.")
+        # Wait to mitigate unexpected short network interruptions
         time.sleep(30)
-        ipAddressResponce = requests.get(fallbackServer)
-        if ipAddressResponce.status_code != 200:
+        ipAddressResponse = requests.get(fallbackServer)
+        if ipAddressResponse.status_code != 200:
             raise getIPError()
 
-    return ipAddressResponce.text
+    return ipAddressResponse.text
 
 
 
