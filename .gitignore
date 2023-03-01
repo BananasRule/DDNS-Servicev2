@@ -16,3 +16,4 @@ __pycache__/
 #Ignore dev env variables
 **/.fleet
 **/.vscode
+*.zip
