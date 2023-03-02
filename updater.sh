@@ -11,6 +11,8 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+cd /opt/DDNS-Servicev2
+
 wget https://github.com/BananasRule/DDNS-Servicev2/releases/latest/download/latestversion.txt
 
 # Get the version numbers from the latest release
