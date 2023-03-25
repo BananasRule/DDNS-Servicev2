@@ -46,7 +46,7 @@ def Get(IPv4 = True):
         if ipAddressResponse.status_code != 200:
             raise getIPError()
 
-    return ipAddressResponse.text
+    return ipAddressResponse.text.strip()
 
 
 
