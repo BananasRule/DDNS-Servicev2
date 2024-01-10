@@ -1,5 +1,10 @@
+## Depreciated for the updated and improved [DDNS-Service-v3](https://github.com/BananasRule/DDNS-Service-v3)
+
+---
+
 # DDNS-SERVICEv2
 ## DDNS Service for use with Cloudflare®
+
 
 ### THIS APPLICATION IS NOT ENDORSED, SPONSORED OR ASSOCIATED WITH CLOUDFLARE
 ### THIS APPLICATION USES THE CLOUDFLARE API V4
